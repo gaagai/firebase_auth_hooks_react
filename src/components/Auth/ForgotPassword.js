@@ -1,7 +1,41 @@
 import React from "react";
+import FirebaseContext from "../../firebase/context";
 
 function ForgotPassword() {
-  return <div>ForgotPassword</div>;
+  const { firebase } = React.useContext(FirebaseContext);
+  const [resetPasswordEmail, setResetPasswordEmail] = React.useState("");
+  const [isPaawordReset, setIsPasswordReset] = React.useState(false);
+  const [passwordResetError, setPasswordResetError] = React.useState(null);
+
+  async function handleResetPassword(params) {
+    try {
+      await firebase.resetPassword(resetPasswordEmail);
+      setIsPasswordReset(true);
+      setPasswordResetError(null);
+    } catch (error) {
+      console.error("Error sending email", error);
+      setPasswordResetError(error.message);
+      setIsPasswordReset(false);
+    }
+  }
+
+  return (
+    <div>
+      <input
+        type="email"
+        className="input"
+        placeholder="Provide your account email"
+        onChange={event => setResetPasswordEmail(event.target.value)}
+      />
+      <div>
+        <button className="button" onClick={handleResetPassword}>
+          Reset Password
+        </button>
+      </div>
+      {isPaawordReset && <p>Check email to reset password</p>}
+      {passwordResetError && <p className="error-text">{passwordResetError}</p>}
+    </div>
+  );
 }
 
 export default ForgotPassword;
